@@ -1,5 +1,5 @@
 local monitor = peripheral.wrap("back")
-monitor.setTextScale(1) -- Escala segura para 4 monitores
+monitor.setTextScale(0.5)
 local w, h = monitor.getSize()
 
 while true do
@@ -10,26 +10,37 @@ while true do
     monitor.setBackgroundColor(colors.black)
     monitor.clear()
 
-    -- Centraliza tudo automaticamente
-    local x_centro = math.floor(w / 2)
-    local y_centro = math.floor(h / 2)
+    local cx = math.floor(w/2)
 
-    -- DESENHO (SOL OU LUA) NO MEIO
+    -- 1. DESENHO COLORIDO (Topo)
     if hora >= 6 and hora < 18 then
-        monitor.setCursorPos(x_centro - 1, y_centro - 2)
         monitor.setBackgroundColor(colors.yellow)
-        monitor.write("   ") -- Um bloco amarelo
+        -- Sol 3x3 pixels
+        for dx = -1, 1 do
+            for dy = 2, 4 do
+                monitor.setCursorPos(cx + dx, dy)
+                monitor.write(" ")
+            end
+        end
     else
-        monitor.setCursorPos(x_centro, y_centro - 2)
         monitor.setBackgroundColor(colors.white)
-        monitor.write("  ") -- Um bloco branco
+        -- Lua 2x2 pixels
+        monitor.setCursorPos(cx, 3)
+        monitor.write("  ")
+        monitor.setCursorPos(cx, 4)
+        monitor.write("  ")
     end
 
-    -- RELÓGIO VERDE LOGO ABAIXO
+    -- 2. RELÓGIO GIGANTE (Base)
     monitor.setBackgroundColor(colors.black)
     monitor.setTextColor(colors.lime)
-    monitor.setCursorPos(math.floor((w - #relogio) / 2) + 1, y_centro + 1)
+    monitor.setTextScale(2) -- ESCALA 2 DEIXA O HORÁRIO ENORME
+    
+    local w2, h2 = monitor.getSize()
+    local x_pos = math.floor((w2 - #relogio) / 2) + 1
+    monitor.setCursorPos(x_pos, h2 - 1)
     monitor.write(relogio)
 
+    monitor.setTextScale(0.5) -- Volta para escala do desenho
     sleep(10)
 end
