@@ -29,14 +29,14 @@ local nuvem = {
 
 -- Lista de frases (curtas para caber no monitor 2x2)
 local frases = {
-    "O tempo ensina.",
-    "Respire fundo.",
-    "Um passo por vez.",
-    "A jornada importa.",
-    "Foco no processo.",
-    "Tudo e licao.",
-    "A mente cria.",
-    "Aproveite o agora."
+    "Menos foco, mais ansiedade",
+    "Sabe onde sua ex ta agora?",
+    "oq sobra?",
+    "durma enquanto eles trabalham.",
+    "se ta dificil pra vc, ta facil pra alguem.",
+    "vamos dar um tempo.",
+    "Eu tenteiiii…",
+    "ela nunca foi sua, só tava na sua vez"
 }
 
 local function drawArt(startX, startY, artData, bgBase)
@@ -125,4 +125,5 @@ while true do
     tick = tick + 1 -- Aumenta o contador para a próxima rodada
     sleep(10)
 end
+
 
