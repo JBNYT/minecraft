@@ -14,7 +14,6 @@ local sol = {
     "  YYY  "
 }
 
--- Lua em formato minguante/crescente natural
 local lua = {
     "  WW  ",
     " WWW  ",
@@ -27,16 +26,16 @@ local nuvem = {
     " WWWW "
 }
 
--- Lista de frases (curtas para caber no monitor 2x2)
+-- Frases divididas em duas linhas para caberem na tela (quando necessário)
 local frases = {
-    "Menos foco, mais ansiedade",
-    "Sabe onde sua ex ta agora?",
-    "oq sobra?",
-    "durma enquanto eles trabalham.",
-    "se ta dificil pra vc, ta facil pra alguem.",
+    {"Menos foco,", "mais ansiedade"},
+    {"Sabe onde sua", "ex ta agora?"},
+    "oq sobra?", -- Frases curtas podem ficar em uma linha só
+    {"durma enquanto", "eles trabalham."},
+    {"se ta dificil pra vc,", "ta facil pra alguem."},
     "vamos dar um tempo.",
-    "Eu tenteiiii…",
-    "ela nunca foi sua, só tava na sua vez"
+    "Eu tenteii...",
+    {"ela nunca foi sua,", "so tava na sua vez"}
 }
 
 local function drawArt(startX, startY, artData, bgBase)
@@ -54,12 +53,12 @@ local function drawArt(startX, startY, artData, bgBase)
     end
 end
 
-local tick = 0 -- Variável para controlar a alternância do texto
+local tick = 0
 
 while true do
     local w, h = monitor.getSize()
     local t = os.date("!*t")
-    local hora = (t.hour - 3) % 24 -- Fuso horário BRT (UTC-3)
+    local hora = (t.hour - 3) % 24
     local relogio = string.format("%02d:%02d", hora, t.min)
 
     local isDay = hora >= 6 and hora < 18
@@ -97,33 +96,46 @@ while true do
     monitor.setCursorPos(x_relogio, y_centro + 1)
     monitor.write(relogio)
 
-    -- Lógica de alternância de texto
-    local texto_inferior = ""
+    -- Lógica de alternância de texto com suporte a múltiplas linhas
+    local texto_linha1 = ""
+    local texto_linha2 = ""
     
     if tick % 2 == 0 then
-        -- Mostra a saudação a cada 10s
-        if hora >= 6 and hora < 12 then texto_inferior = "BOM DIA!"
-        elseif hora >= 12 and hora < 18 then texto_inferior = "BOA TARDE!"
-        else texto_inferior = "BOA NOITE!" end
+        if hora >= 6 and hora < 12 then texto_linha1 = "BOM DIA, WINGZ!"
+        elseif hora >= 12 and hora < 18 then texto_linha1 = "BOA TARDE, WINGZ!"
+        else texto_linha1 = "BOA NOITE, WINGZ!" end
     else
-        -- Mostra uma frase filosófica aleatória nos outros 10s
         math.randomseed(os.time() + tick)
         local index = math.random(1, #frases)
-        texto_inferior = frases[index]
+        local frase_escolhida = frases[index]
+        
+        -- Verifica se a frase foi dividida em duas partes (se é uma tabela)
+        if type(frase_escolhida) == "table" then
+            texto_linha1 = frase_escolhida[1]
+            texto_linha2 = frase_escolhida[2]
+        else
+            texto_linha1 = frase_escolhida
+        end
     end
 
-    local x_texto = math.floor((w - #texto_inferior) / 2) + 1
-    monitor.setCursorPos(x_texto, y_centro + 3)
+    -- Imprime a primeira linha
+    local x_texto1 = math.floor((w - #texto_linha1) / 2) + 1
+    monitor.setCursorPos(x_texto1, y_centro + 3)
     
     if isDay then
         monitor.setTextColor(colors.yellow)
     else
         monitor.setTextColor(colors.lightGray)
     end
-    monitor.write(texto_inferior)
+    monitor.write(texto_linha1)
 
-    tick = tick + 1 -- Aumenta o contador para a próxima rodada
+    -- Imprime a segunda linha logo abaixo (se ela existir)
+    if texto_linha2 ~= "" then
+        local x_texto2 = math.floor((w - #texto_linha2) / 2) + 1
+        monitor.setCursorPos(x_texto2, y_centro + 4)
+        monitor.write(texto_linha2)
+    end
+
+    tick = tick + 1
     sleep(10)
 end
-
-
