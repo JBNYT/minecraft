@@ -102,9 +102,9 @@ while true do
     
     if tick % 2 == 0 then
         -- Mostra a saudação a cada 10s
-        if hora >= 6 and hora < 12 then texto_inferior = "BOM DIA, WINGZ!"
-        elseif hora >= 12 and hora < 18 then texto_inferior = "BOA TARDE, WINGZ!"
-        else texto_inferior = "BOA NOITE, WINGZ!" end
+        if hora >= 6 and hora < 12 then texto_inferior = "BOM DIA!"
+        elseif hora >= 12 and hora < 18 then texto_inferior = "BOA TARDE!"
+        else texto_inferior = "BOA NOITE!" end
     else
         -- Mostra uma frase filosófica aleatória nos outros 10s
         math.randomseed(os.time() + tick)
@@ -125,3 +125,4 @@ while true do
     tick = tick + 1 -- Aumenta o contador para a próxima rodada
     sleep(10)
 end
+
