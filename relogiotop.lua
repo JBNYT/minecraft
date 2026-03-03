@@ -1,5 +1,5 @@
 local monitor = peripheral.wrap("back")
-monitor.setTextScale(0.5)
+monitor.setTextScale(1) -- Escala 1 é ideal para 4 monitores (2x2)
 local w, h = monitor.getSize()
 
 while true do
@@ -10,39 +10,31 @@ while true do
     monitor.setBackgroundColor(colors.black)
     monitor.clear()
 
-    local cx, cy = math.floor(w/2), 8
+    -- 1. DESENHO CENTRAL (SOL OU LUA)
+    local cx = math.floor(w/2)
     if hora >= 6 and hora < 18 then
-        -- SOL GIGANTE (Desenho com blocos)
+        monitor.setCursorPos(cx - 1, 2)
         monitor.setBackgroundColor(colors.yellow)
-        for dx = -2, 2 do
-            for dy = -1, 1 do
-                monitor.setCursorPos(cx + dx, cy + dy)
-                monitor.write(" ")
-            end
-        end
+        monitor.write("   ") -- Topo do sol
+        monitor.setCursorPos(cx - 2, 3)
+        monitor.write("     ") -- Meio do sol
+        monitor.setCursorPos(cx - 1, 4)
+        monitor.write("   ") -- Base do sol
     else
-        -- LUA GIGANTE + ESTRELAS
+        monitor.setCursorPos(cx, 2)
         monitor.setBackgroundColor(colors.white)
-        monitor.setCursorPos(cx-1, cy)
-        monitor.write("    ") -- Corpo da lua
-        -- Estrelas aleatórias
-        monitor.setBackgroundColor(colors.black)
-        monitor.setTextColor(colors.lightGray)
-        for i=1, 5 do
-            monitor.setCursorPos(math.random(2, w-2), math.random(2, 10))
-            monitor.write(".")
-        end
+        monitor.write("  ") -- Lua simples
+        monitor.setCursorPos(cx + 1, 3)
+        monitor.write(" ")
     end
 
-    -- RELÓGIO GIGANTE (Escala 1 ou 2 para ocupar a largura)
+    -- 2. RELÓGIO GIGANTE EMBAIXO
     monitor.setBackgroundColor(colors.black)
-    monitor.setTextScale(1.5) -- Aumenta aqui para o horário ficar enorme
     monitor.setTextColor(colors.lime)
-    
-    local w_g, h_g = monitor.getSize()
-    monitor.setCursorPos(math.floor((w_g - #relogio)/2) + 1, h_g - 2)
+    -- Centraliza o texto baseado na largura (w)
+    local x_pos = math.floor((w - #relogio) / 2) + 1
+    monitor.setCursorPos(x_pos, h - 1)
     monitor.write(relogio)
 
-    monitor.setTextScale(0.5) -- Volta para os desenhos
-    sleep(15)
+    sleep(10)
 end
