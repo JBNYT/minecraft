@@ -1,5 +1,5 @@
 local monitor = peripheral.wrap("back")
-monitor.setTextScale(1) -- Escala 1 é ideal para 4 monitores (2x2)
+monitor.setTextScale(1) -- Escala segura para 4 monitores
 local w, h = monitor.getSize()
 
 while true do
@@ -10,30 +10,25 @@ while true do
     monitor.setBackgroundColor(colors.black)
     monitor.clear()
 
-    -- 1. DESENHO CENTRAL (SOL OU LUA)
-    local cx = math.floor(w/2)
+    -- Centraliza tudo automaticamente
+    local x_centro = math.floor(w / 2)
+    local y_centro = math.floor(h / 2)
+
+    -- DESENHO (SOL OU LUA) NO MEIO
     if hora >= 6 and hora < 18 then
-        monitor.setCursorPos(cx - 1, 2)
+        monitor.setCursorPos(x_centro - 1, y_centro - 2)
         monitor.setBackgroundColor(colors.yellow)
-        monitor.write("   ") -- Topo do sol
-        monitor.setCursorPos(cx - 2, 3)
-        monitor.write("     ") -- Meio do sol
-        monitor.setCursorPos(cx - 1, 4)
-        monitor.write("   ") -- Base do sol
+        monitor.write("   ") -- Um bloco amarelo
     else
-        monitor.setCursorPos(cx, 2)
+        monitor.setCursorPos(x_centro, y_centro - 2)
         monitor.setBackgroundColor(colors.white)
-        monitor.write("  ") -- Lua simples
-        monitor.setCursorPos(cx + 1, 3)
-        monitor.write(" ")
+        monitor.write("  ") -- Um bloco branco
     end
 
-    -- 2. RELÓGIO GIGANTE EMBAIXO
+    -- RELÓGIO VERDE LOGO ABAIXO
     monitor.setBackgroundColor(colors.black)
     monitor.setTextColor(colors.lime)
-    -- Centraliza o texto baseado na largura (w)
-    local x_pos = math.floor((w - #relogio) / 2) + 1
-    monitor.setCursorPos(x_pos, h - 1)
+    monitor.setCursorPos(math.floor((w - #relogio) / 2) + 1, y_centro + 1)
     monitor.write(relogio)
 
     sleep(10)
