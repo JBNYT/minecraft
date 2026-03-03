@@ -101,9 +101,9 @@ while true do
     local texto_linha2 = ""
     
     if tick % 2 == 0 then
-        if hora >= 6 and hora < 12 then texto_linha1 = "BOM DIA, WINGZ!"
-        elseif hora >= 12 and hora < 18 then texto_linha1 = "BOA TARDE, WINGZ!"
-        else texto_linha1 = "BOA NOITE, WINGZ!" end
+        if hora >= 6 and hora < 12 then texto_linha1 = "BOM DIA!"
+        elseif hora >= 12 and hora < 18 then texto_linha1 = "BOA TARDE!"
+        else texto_linha1 = "BOA NOITE!" end
     else
         math.randomseed(os.time() + tick)
         local index = math.random(1, #frases)
@@ -139,3 +139,4 @@ while true do
     tick = tick + 1
     sleep(10)
 end
+
