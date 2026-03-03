@@ -1,46 +1,110 @@
 local monitor = peripheral.wrap("back")
-monitor.setTextScale(0.5)
-local w, h = monitor.getSize()
+if not monitor then
+    print("Monitor nao encontrado!")
+    return
+end
+
+monitor.setTextScale(1)
+
+-- Matrizes para os desenhos (Pixel Art)
+-- Y = Amarelo, W = Branco, L = Cinza Claro, Espaço = Fundo
+local sol = {
+    "  YYY  ",
+    " YYYYY ",
+    " YYYYY ",
+    "  YYY  "
+}
+
+local lua = {
+    "  LLL ",
+    " LL   ",
+    " LL   ",
+    "  LLL "
+}
+
+local nuvem = {
+    "  WW  ",
+    " WWWW "
+}
+
+-- Função que lê a matriz e pinta os blocos na tela
+local function drawArt(startX, startY, artData, bgBase)
+    for y, row in ipairs(artData) do
+        monitor.setCursorPos(startX, startY + y - 1)
+        for x = 1, #row do
+            local char = row:sub(x, x)
+            if char == "Y" then monitor.setBackgroundColor(colors.yellow)
+            elseif char == "W" then monitor.setBackgroundColor(colors.white)
+            elseif char == "L" then monitor.setBackgroundColor(colors.lightGray)
+            else monitor.setBackgroundColor(bgBase) end
+            
+            monitor.write(" ") -- Pinta 1 caractere de espaço com a cor de fundo
+        end
+    end
+end
 
 while true do
+    local w, h = monitor.getSize()
     local t = os.date("!*t")
-    local hora = (t.hour - 3) % 24
+    local hora = (t.hour - 3) % 24 -- Fuso horário BRT (UTC-3)
     local relogio = string.format("%02d:%02d", hora, t.min)
 
-    monitor.setBackgroundColor(colors.black)
+    local isDay = hora >= 6 and hora < 18
+    local bgBase = isDay and colors.lightBlue or colors.black
+
+    -- Limpa a tela inteira com a cor base (Céu Azul ou Noite Preta)
+    monitor.setBackgroundColor(bgBase)
     monitor.clear()
 
-    local cx = math.floor(w/2)
+    local x_centro = math.floor(w / 2)
+    local y_centro = math.floor(h / 2)
 
-    -- 1. DESENHO COLORIDO (Topo)
-    if hora >= 6 and hora < 18 then
-        monitor.setBackgroundColor(colors.yellow)
-        -- Sol 3x3 pixels
-        for dx = -1, 1 do
-            for dy = 2, 4 do
-                monitor.setCursorPos(cx + dx, dy)
-                monitor.write(" ")
-            end
-        end
+    -- Desenha o cenário dependendo do horário
+    if isDay then
+        -- Desenha Sol centralizado e Nuvens nos cantos
+        drawArt(x_centro - 3, y_centro - 6, sol, bgBase)
+        drawArt(3, 2, nuvem, bgBase)
+        drawArt(w - 7, y_centro - 2, nuvem, bgBase)
     else
-        monitor.setBackgroundColor(colors.white)
-        -- Lua 2x2 pixels
-        monitor.setCursorPos(cx, 3)
-        monitor.write("  ")
-        monitor.setCursorPos(cx, 4)
-        monitor.write("  ")
+        -- Desenha Lua centralizada
+        drawArt(x_centro - 2, y_centro - 6, lua, bgBase)
+        
+        -- Desenha algumas estrelas no fundo
+        monitor.setBackgroundColor(colors.black)
+        monitor.setTextColor(colors.yellow)
+        monitor.setCursorPos(4, 3) monitor.write("*")
+        monitor.setCursorPos(w - 5, 2) monitor.write("+")
+        monitor.setCursorPos(w - 3, y_centro) monitor.write(".")
+        monitor.setCursorPos(6, h - 3) monitor.write(".")
     end
 
-    -- 2. RELÓGIO GIGANTE (Base)
-    monitor.setBackgroundColor(colors.black)
-    monitor.setTextColor(colors.lime)
-    monitor.setTextScale(2) -- ESCALA 2 DEIXA O HORÁRIO ENORME
-    
-    local w2, h2 = monitor.getSize()
-    local x_pos = math.floor((w2 - #relogio) / 2) + 1
-    monitor.setCursorPos(x_pos, h2 - 1)
+    -- Relógio Verde / Branco no centro
+    monitor.setBackgroundColor(bgBase)
+    if isDay then
+        monitor.setTextColor(colors.white)
+    else
+        monitor.setTextColor(colors.lime)
+    end
+
+    local x_relogio = math.floor((w - #relogio) / 2) + 1
+    monitor.setCursorPos(x_relogio, y_centro + 1)
     monitor.write(relogio)
 
-    monitor.setTextScale(0.5) -- Volta para escala do desenho
+    -- Saudação para preencher a parte de baixo da tela
+    local saudacao = ""
+    if hora >= 6 and hora < 12 then saudacao = "BOM DIA!"
+    elseif hora >= 12 and hora < 18 then saudacao = "BOA TARDE!"
+    else saudacao = "BOA NOITE!" end
+
+    local x_saudacao = math.floor((w - #saudacao) / 2) + 1
+    monitor.setCursorPos(x_saudacao, y_centro + 3)
+    
+    if isDay then
+        monitor.setTextColor(colors.yellow)
+    else
+        monitor.setTextColor(colors.lightGray)
+    end
+    monitor.write(saudacao)
+
     sleep(10)
 end
