@@ -7,7 +7,6 @@ end
 monitor.setTextScale(1)
 
 -- Matrizes para os desenhos (Pixel Art)
--- Y = Amarelo, W = Branco, L = Cinza Claro, Espaço = Fundo
 local sol = {
     "  YYY  ",
     " YYYYY ",
@@ -15,11 +14,12 @@ local sol = {
     "  YYY  "
 }
 
+-- Lua em formato minguante/crescente natural
 local lua = {
-    "  LLL ",
-    " LL   ",
-    " LL   ",
-    "  LLL "
+    "  WW  ",
+    " WWW  ",
+    " WWW  ",
+    "  WW  "
 }
 
 local nuvem = {
@@ -27,7 +27,18 @@ local nuvem = {
     " WWWW "
 }
 
--- Função que lê a matriz e pinta os blocos na tela
+-- Lista de frases (curtas para caber no monitor 2x2)
+local frases = {
+    "O tempo ensina.",
+    "Respire fundo.",
+    "Um passo por vez.",
+    "A jornada importa.",
+    "Foco no processo.",
+    "Tudo e licao.",
+    "A mente cria.",
+    "Aproveite o agora."
+}
+
 local function drawArt(startX, startY, artData, bgBase)
     for y, row in ipairs(artData) do
         monitor.setCursorPos(startX, startY + y - 1)
@@ -38,10 +49,12 @@ local function drawArt(startX, startY, artData, bgBase)
             elseif char == "L" then monitor.setBackgroundColor(colors.lightGray)
             else monitor.setBackgroundColor(bgBase) end
             
-            monitor.write(" ") -- Pinta 1 caractere de espaço com a cor de fundo
+            monitor.write(" ")
         end
     end
 end
+
+local tick = 0 -- Variável para controlar a alternância do texto
 
 while true do
     local w, h = monitor.getSize()
@@ -52,24 +65,19 @@ while true do
     local isDay = hora >= 6 and hora < 18
     local bgBase = isDay and colors.lightBlue or colors.black
 
-    -- Limpa a tela inteira com a cor base (Céu Azul ou Noite Preta)
     monitor.setBackgroundColor(bgBase)
     monitor.clear()
 
     local x_centro = math.floor(w / 2)
     local y_centro = math.floor(h / 2)
 
-    -- Desenha o cenário dependendo do horário
     if isDay then
-        -- Desenha Sol centralizado e Nuvens nos cantos
         drawArt(x_centro - 3, y_centro - 6, sol, bgBase)
         drawArt(3, 2, nuvem, bgBase)
         drawArt(w - 7, y_centro - 2, nuvem, bgBase)
     else
-        -- Desenha Lua centralizada
         drawArt(x_centro - 2, y_centro - 6, lua, bgBase)
         
-        -- Desenha algumas estrelas no fundo
         monitor.setBackgroundColor(colors.black)
         monitor.setTextColor(colors.yellow)
         monitor.setCursorPos(4, 3) monitor.write("*")
@@ -78,7 +86,6 @@ while true do
         monitor.setCursorPos(6, h - 3) monitor.write(".")
     end
 
-    -- Relógio Verde / Branco no centro
     monitor.setBackgroundColor(bgBase)
     if isDay then
         monitor.setTextColor(colors.white)
@@ -90,21 +97,31 @@ while true do
     monitor.setCursorPos(x_relogio, y_centro + 1)
     monitor.write(relogio)
 
-    -- Saudação para preencher a parte de baixo da tela
-    local saudacao = ""
-    if hora >= 6 and hora < 12 then saudacao = "BOM DIA!"
-    elseif hora >= 12 and hora < 18 then saudacao = "BOA TARDE!"
-    else saudacao = "BOA NOITE!" end
+    -- Lógica de alternância de texto
+    local texto_inferior = ""
+    
+    if tick % 2 == 0 then
+        -- Mostra a saudação a cada 10s
+        if hora >= 6 and hora < 12 then texto_inferior = "BOM DIA, WINGZ!"
+        elseif hora >= 12 and hora < 18 then texto_inferior = "BOA TARDE, WINGZ!"
+        else texto_inferior = "BOA NOITE, WINGZ!" end
+    else
+        -- Mostra uma frase filosófica aleatória nos outros 10s
+        math.randomseed(os.time() + tick)
+        local index = math.random(1, #frases)
+        texto_inferior = frases[index]
+    end
 
-    local x_saudacao = math.floor((w - #saudacao) / 2) + 1
-    monitor.setCursorPos(x_saudacao, y_centro + 3)
+    local x_texto = math.floor((w - #texto_inferior) / 2) + 1
+    monitor.setCursorPos(x_texto, y_centro + 3)
     
     if isDay then
         monitor.setTextColor(colors.yellow)
     else
         monitor.setTextColor(colors.lightGray)
     end
-    monitor.write(saudacao)
+    monitor.write(texto_inferior)
 
+    tick = tick + 1 -- Aumenta o contador para a próxima rodada
     sleep(10)
 end
