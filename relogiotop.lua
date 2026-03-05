@@ -6,7 +6,7 @@ end
 
 monitor.setTextScale(1)
 
--- Matrizes para os desenhos (Pixel Art)
+-- Matrizes para os desenhos
 local sol = {
     "  YYY  ",
     " YYYYY ",
@@ -14,10 +14,11 @@ local sol = {
     "  YYY  "
 }
 
+-- Formato de Lua ajustado (Crescente/Minguante fina)
 local lua = {
     "  WW  ",
-    " WWW  ",
-    " WWW  ",
+    " W    ",
+    " W    ",
     "  WW  "
 }
 
@@ -26,7 +27,6 @@ local nuvem = {
     " WWWW "
 }
 
--- Frases divididas em duas linhas para caberem na tela (quando necessário)
 local frases = {
     {"Menos foco,", "mais ansiedade"},
     {"Sabe onde sua", "ex ta agora?"},
@@ -62,7 +62,9 @@ while true do
     local relogio = string.format("%02d:%02d", hora, t.min)
 
     local isDay = hora >= 6 and hora < 18
-    local bgBase = isDay and colors.lightBlue or colors.black
+    
+    -- Mudei para 'colors.blue' para não estourar a luz do shader
+    local bgBase = isDay and colors.blue or colors.black
 
     monitor.setBackgroundColor(bgBase)
     monitor.clear()
@@ -86,8 +88,10 @@ while true do
     end
 
     monitor.setBackgroundColor(bgBase)
+    
+    -- Texto preto de dia para dar leitura com o shader, verde à noite
     if isDay then
-        monitor.setTextColor(colors.white)
+        monitor.setTextColor(colors.black)
     else
         monitor.setTextColor(colors.lime)
     end
@@ -96,7 +100,6 @@ while true do
     monitor.setCursorPos(x_relogio, y_centro + 1)
     monitor.write(relogio)
 
-    -- Lógica de alternância de texto com suporte a múltiplas linhas
     local texto_linha1 = ""
     local texto_linha2 = ""
     
@@ -109,7 +112,6 @@ while true do
         local index = math.random(1, #frases)
         local frase_escolhida = frases[index]
         
-        -- Verifica se a frase foi dividida em duas partes (se é uma tabela)
         if type(frase_escolhida) == "table" then
             texto_linha1 = frase_escolhida[1]
             texto_linha2 = frase_escolhida[2]
@@ -118,18 +120,17 @@ while true do
         end
     end
 
-    -- Imprime a primeira linha
     local x_texto1 = math.floor((w - #texto_linha1) / 2) + 1
     monitor.setCursorPos(x_texto1, y_centro + 3)
     
+    -- Texto preto de dia para dar leitura
     if isDay then
-        monitor.setTextColor(colors.yellow)
+        monitor.setTextColor(colors.black)
     else
         monitor.setTextColor(colors.lightGray)
     end
     monitor.write(texto_linha1)
 
-    -- Imprime a segunda linha logo abaixo (se ela existir)
     if texto_linha2 ~= "" then
         local x_texto2 = math.floor((w - #texto_linha2) / 2) + 1
         monitor.setCursorPos(x_texto2, y_centro + 4)
@@ -139,4 +140,3 @@ while true do
     tick = tick + 1
     sleep(10)
 end
-
